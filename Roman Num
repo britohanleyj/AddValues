@@ -1,0 +1,218 @@
+# Roman Numeral Program
+# Julian Brito
+
+	.data
+	.align	2
+outmsg: .asciiz " That Equals "			# the out message for equals
+promptmsg: .asciiz " Enter Roman Numeral  "		# The prompt string
+runmsg: .asciiz ", Times program has run = "	# The out message for run counter
+StringEnt: .space 15 		# Evaulates space for the pointers to move
+
+I: .byte 0x49			# assigns I from the hex code of the I letter
+V: .byte 0x56			# assigns V from the hex code of the V letter
+X: .byte 0x58			# assigns X from the hex code of the X letter
+L: .byte 0x4C			# assigns L from the hex code of the L letter
+C: .byte 0x43			# assigns C from the hex code of the C letter
+D: .byte 0x44			# assigns D from the hex code of the D letter
+M: .byte 0x4D			# assigns M from the hex code of the M letter
+cero: .byte 0x30 		# assigns cero from the hex code of 0 
+E: .byte 0x45			# assigns E for extra! from the hex code of the E letter
+
+	.text
+	.globl 	main
+main:	
+   	
+	move    $s1, $0		# s1: runningSum = 0
+	la 	$a0, promptmsg	# get str from Usr
+	li 	$v0,4		# print string 
+	syscall
+	
+	addi $a2, $a2, 0	# sets and adds 0 to run counter
+	
+	la $a0, StringEnt 	# load the string address
+   	move $s0, $a0           # Keep the address for later use in s0 as first pointer
+   	move $s2 $a0            # Keep the address for later use in s2 as second pointer
+   	li $a1, 15              # max 10 characters so not to create complications with StringEnt space (9 chars + 1 null)
+   	li $v0, 8               # read string 
+   	syscall                 
+
+
+
+#****** Test for end ***********************************************
+	lb $t1, cero		# Loads cero (0) 
+test0:
+	lb $t0, ($s0)		# Loads first pointer
+	beq   $t1, $t0, finish	# Jump to finish and end program if a 0 is detected
+	
+#------ I Function ---------------------------------	
+
+	lb $t1, I		# Loads I
+	lb $t2, V		# Loads V
+	lb $t3, X		# Loads X
+	addi $s2, $s2, 1	# Moves second pointer to i+1
+LoopI:
+	lb $t0, ($s0)		# Loads first pointer
+	lb $t4, ($s2)		# Loads second pointer
+	beqz $t0, LoopVbgn	# Determines if we reached end of sequence and goes to next function if not
+	addi $s0, $s0, 1	# add 1 to first pointer
+	addi $s2, $s2, 1	# add 1 to second pointer
+	bne $t1, $t0, LoopI	# checks for an I and goes back up if not
+	addi $s1, $s1, 1	# add 1 to runningSum
+	bne $t2, $t4, SkipI	# checks if a V is invloved and goes to elif (SkipI)
+	addi $s1, $s1, -2	# subtracts 2 from sum to make up for IV
+SkipI:
+	bne $t3, $t4, LoopI	# checks if a X is invloved and goes back up if not
+	addi $s1, $s1, -2	# subtracts 2 from sum to make up for IX
+	j LoopI			# jumps back to begining for function
+
+#------ V Function ---------------------------------
+
+LoopVbgn:
+	lb $t1, V		# Loads V
+	move  $s0, $a0		# Resets s0 pointer address
+LoopV:
+	lb $t0, ($s0)		# Loads first pointer
+	beqz $t0, LoopXbgn	# Determines if we reached end of sequence and goes to next function if not
+	addi $s0, $s0, 1	# add 1 to first pointer
+	bne $t1, $t0, LoopV	# checks for a V and goes back up if not
+	addi $s1, $s1, 5	# add 5 to runningSum
+	j LoopV			# jumps back to begining for function
+
+#------ X Function ----------------------------------
+
+LoopXbgn:
+	lb $t1, X		# Loads X
+	lb $t2, L		# Loads L
+	lb $t3, C		# Loads C
+	move $s0, $a0		# Resets s0 pointer address
+	move $s2 $a0		# Resets s2 pointer address
+	addi $s2, $s2, 1	# Moves second pointer to i+1
+LoopX:
+	lb $t0, ($s0)		# Loads first pointer
+	lb $t4, ($s2)		# Loads second pointer
+	beqz $t0, LoopLbgn	# Determines if we reached end of sequence and goes to next function if not
+	addi $s0, $s0, 1	# add 1 to first pointer
+	addi $s2, $s2, 1	# add 1 to second pointer
+	bne $t1, $t0, LoopX	# checks for a X and goes back up if not
+	addi $s1, $s1, 10	# adds 10 to runningSum
+	bne $t2, $t4, SkipX	# checks if a L is invloved and goes to elif (SkipX)
+	addi $s1, $s1, -20	# subtracts 20 from sum to make up for XL
+SkipX:
+	bne $t3, $t4, LoopX	# checks if a C is invloved and goes back up if not
+	addi $s1, $s1, -20	# subtracts 20 from sum to make up for XC
+	j LoopX			# jumps back to begining for function
+
+#------ L Function ---------------------------------
+
+LoopLbgn:
+	lb $t1, L		# Loads L
+	move $s0, $a0		# Resets s0 pointer address
+LoopL:
+	lb $t0, ($s0)		# Loads first pointer
+	beqz $t0, LoopCbgn	# Determines if we reached end of sequence and goes to next function if not
+	addi $s0, $s0, 1	# add 1 to first pointer
+	bne $t1, $t0, LoopL	# checks for L and goes back up if not
+	addi $s1, $s1, 50	# adds 50 to runningSum
+	j LoopL			# jumps back to begining for function
+
+#------ C Function ---------------------------------
+
+LoopCbgn:
+	lb $t1, C		# Loads C
+	lb $t2, D		# Loads D
+	lb $t3, M		# Loads M
+	move $s0, $a0		# Resets s0 pointer address
+	move $s2 $a0		# Resets s2 pointer address
+	addi $s2, $s2, 1	# Moves second pointer to i+1
+LoopC:
+	lb $t0, ($s0)		# Loads first pointer
+	lb $t4, ($s2)		# Loads second pointer
+	beqz $t0, LoopDbgn	# Determines if we reached end of sequence and goes to next function if not
+	addi $s0, $s0, 1	# add 1 to first pointer	
+	addi $s2, $s2, 1	# add 1 to second pointer
+	bne $t1, $t0, LoopC 	# checks for a C and goes back up if not
+	addi $s1, $s1, 100	# adds 100 to sum
+	bne $t2, $t4, SkipC	# checks if a D is invloved and goes to elif (SkipX)
+	addi $s1, $s1, -200	# subtracts 200 from sum to make up for CD
+SkipC:
+	bne $t3, $t4, LoopC	# checks if a C is invloved and goes back up if not
+	addi $s1, $s1, -200	# subtracts 200 from sum to make up for CM
+	j LoopC
+	
+#------ D Function ---------------------------------
+	
+LoopDbgn:
+	lb $t1, D		# Loads D
+	move $s0, $a0		# Resets s0 pointer address
+LoopD:
+	lb $t0, ($s0)		# Loads first pointer
+	beqz $t0, LoopMbgn	# Determines if we reached end of sequence and goes to next function if not
+	addi $s0, $s0, 1	# add 1 to first pointer
+	bne $t1, $t0, LoopD	# checks for a D and goes back up if not
+	addi $s1, $s1, 500	# adds 500 to sum
+	j LoopD			# jumps back to begining for function
+	
+#------ M Function ---------------------------------	
+	
+LoopMbgn:
+	lb $t1, M		# Loads M
+	lb $t2, E		# Loads D
+	move $s0, $a0		# Resets s0 pointer address
+	move $s2 $a0		# Resets s2 pointer address
+	addi $s2, $s2, 1	# Moves second pointer to i+1
+LoopM:
+	lb $t0, ($s0)		# Loads first pointer
+	lb $t4, ($s2)		# Loads second pointer
+	beqz $t0, LoopEbgn	# Determines if we reached end of sequence and goes to done to print sum and to run again
+	addi $s0, $s0, 1	# add 1 to first pointer
+	addi $s2, $s2, 1	# add 1 to second pointer
+	bne $t1, $t0, LoopM	# checks for a M and goes back up if not
+	addi $s1, $s1, 1000	# adds 1000 to sum
+	bne $t2, $t4, LoopM	# checks if a E is invloved and goes back up if not
+	addi $s1, $s1, -991000	# subtracts 991000 from sum to make up for ME
+	j LoopM
+
+#------ E for Extra ---------------------------------	
+	
+LoopEbgn:
+	lb $t1, E		# Loads E
+	move $s0, $a0		# Resets s0 pointer address
+LoopE:
+	lb $t0, ($s0)		# Loads first pointer
+	beqz $t0, done		# Determines if we reached end of sequence and goes to done to print sum and to run again
+	addi $s0, $s0, 1	# add 1 to first pointer
+	bne $t1, $t0, LoopE	# checks for a M and goes back up if not
+	addi $s1, $s1, 1000000	# adds 1 Million to sum
+	j LoopE
+	
+#------ Display results ---------------------------------
+
+done:
+
+	addi $a2, $a2, 1	# adds 1 to run counter
+    	   	   	
+   	la $a0, outmsg     	# load the outmsg
+   	li $v0, 4               # print 
+    	syscall                 # print
+
+   	move $a0, $s1           # loads the sum
+   	li $v0, 1               # print 
+   	syscall                 # print 
+   	
+   	la $a0, runmsg		# loads the out message for run counter
+   	li $v0, 4               # print string 
+    	syscall                 # 
+ 
+    	move $a0, $a2           # loads the run count
+   	li $v0, 1               # print 
+   	syscall                 # print 
+   	
+   	j main			#jump back to main to start over
+   
+
+#------ Finish ---------------------------------   	
+   	
+finish:  	 
+        li $v0, 10		#End of Program
+	syscall
+	
