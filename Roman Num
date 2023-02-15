@@ -39,6 +39,7 @@ main:
 
 
 #****** Test for end ***********************************************
+
 	lb $t1, cero		# Loads cero (0) 
 test0:
 	lb $t0, ($s0)		# Loads first pointer
@@ -63,7 +64,7 @@ LoopI:
 SkipI:
 	bne $t3, $t4, LoopI	# checks if a X is invloved and goes back up if not
 	addi $s1, $s1, -2	# subtracts 2 from sum to make up for IX
-	j LoopI			# jumps back to begining for function
+	j LoopI			# jumps back to begining of function
 
 #------ V Function ---------------------------------
 
@@ -76,7 +77,7 @@ LoopV:
 	addi $s0, $s0, 1	# add 1 to first pointer
 	bne $t1, $t0, LoopV	# checks for a V and goes back up if not
 	addi $s1, $s1, 5	# add 5 to runningSum
-	j LoopV			# jumps back to begining for function
+	j LoopV			# jumps back to begining of function
 
 #------ X Function ----------------------------------
 
@@ -100,7 +101,7 @@ LoopX:
 SkipX:
 	bne $t3, $t4, LoopX	# checks if a C is invloved and goes back up if not
 	addi $s1, $s1, -20	# subtracts 20 from sum to make up for XC
-	j LoopX			# jumps back to begining for function
+	j LoopX			# jumps back to begining of function
 
 #------ L Function ---------------------------------
 
@@ -113,7 +114,7 @@ LoopL:
 	addi $s0, $s0, 1	# add 1 to first pointer
 	bne $t1, $t0, LoopL	# checks for L and goes back up if not
 	addi $s1, $s1, 50	# adds 50 to runningSum
-	j LoopL			# jumps back to begining for function
+	j LoopL			# jumps back to begining of function
 
 #------ C Function ---------------------------------
 
@@ -172,7 +173,7 @@ LoopM:
 	addi $s1, $s1, -991000	# subtracts 991000 from sum to make up for ME
 	j LoopM
 
-#------ E for Extra ---------------------------------	
+#------ E for Extra Function ---------------------------------	
 	
 LoopEbgn:
 	lb $t1, E		# Loads E
